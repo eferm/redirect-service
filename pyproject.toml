@@ -6,12 +6,15 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = ["fastapi>=0.115.8", "modal>=0.73.43"]
 
+[dependency-groups]
+dev = ["mypy>=1.15.0", "ruff>=0.9.6"]
+
 [tool.ruff]
 line-length = 88
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D1"]
+ignore = ["D"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true

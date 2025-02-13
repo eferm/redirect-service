@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import os
+import urllib.parse
+
 import modal
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
@@ -11,8 +14,9 @@ webapp = FastAPI()
 
 @webapp.get("/{page}")
 async def redirect_page(page: str) -> RedirectResponse:
-    target_domain = "https://example.com"
-    return RedirectResponse(url=f"{target_domain}?page={page}")
+    campaign = urllib.parse.quote(page)
+    target = f"https://apps.apple.com/app/id{os.environ['APP_ID']}?ct={campaign}"
+    return RedirectResponse(url=target)
 
 
 @webapp.get("/")
@@ -23,14 +27,7 @@ async def redirect_root() -> RedirectResponse:
 image = modal.Image.debian_slim().pip_install("fastapi")
 
 
-@app.function(image=image)
+@app.function(image=image, secrets=[modal.Secret.from_name("apple-secret")])
 @modal.asgi_app()
-def main() -> modal.App:
+def main() -> FastAPI:
     return webapp
-
-
-# To deploy:
-# 1. Save this as app.py
-# 2. Run: modal deploy app.py
-# To run locally for development:
-# modal serve app.py
